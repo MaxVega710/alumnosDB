@@ -53,7 +53,21 @@ public class AlumnosDB implements Persistencia, Proyeccion{
 
     @Override
     public long updateAlumno(Alumno alumno) {
-        return 0;
+        ContentValues values = new ContentValues();
+        values.put(DefineTable.Alumnos.COLUMN_NAME_MATRICULA,alumno.getMatricula());
+        values.put(DefineTable.Alumnos.COLUMN_NAME_NOMBRE,alumno.getNombre());
+        values.put(DefineTable.Alumnos.COLUMN_NAME_CARRERA,alumno.getCarrera());
+        values.put(DefineTable.Alumnos.COLUMN_NAME_FOTO,alumno.getImagen());
+
+        this.openDataBase();
+        long num = sqLiteDatabase.update(DefineTable.Alumnos.TABLE_NAME,
+                values,
+                DefineTable.Alumnos.COLUMN_NAME_ID +"=" + alumno.getId(),null);
+
+        this.closeDataBase();
+        Log.d("modificar", "se modifico el id"+alumno.getId());
+        return num;
+
     }
 
     @Override
@@ -68,16 +82,43 @@ public class AlumnosDB implements Persistencia, Proyeccion{
 
     @Override
     public Alumno getAlumno(String matricula) {
-        return null;
+        sqLiteDatabase =helper.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.query(DefineTable.Alumnos.TABLE_NAME,DefineTable.Alumnos.REGISTRO,
+                DefineTable.Alumnos.COLUMN_NAME_MATRICULA + "=?",
+                new String[]{matricula},null,null,null);
+        cursor.moveToFirst();
+        Alumno alumno = readAlumno(cursor);
+        cursor.close();
+        return alumno;
     }
 
     @Override
     public ArrayList<Alumno> allAlumnos() {
-        return null;
+        sqLiteDatabase = helper.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.query(DefineTable.Alumnos.TABLE_NAME,DefineTable.Alumnos.REGISTRO,
+                null,null,null,null,null);
+        cursor.moveToFirst();
+        ArrayList<Alumno> alumnos = new ArrayList<Alumno>();
+        while (!cursor.isAfterLast()){
+
+            Alumno alumno = readAlumno(cursor);
+            alumnos.add(alumno);
+            cursor.moveToNext();
+
+        }
+        cursor.close();
+        return alumnos;
     }
 
     @Override
     public Alumno readAlumno(Cursor cursor) {
-        return null;
+        Alumno alumno = new Alumno();
+        alumno.setId(cursor.getInt(0));
+        alumno.setMatricula(cursor.getString(1));
+        alumno.setNombre(cursor.getString(2));
+        alumno.setCarrera(cursor.getString(3));
+        alumno.setImagen(cursor.getString(4));
+        return alumno;
+
     }
 }

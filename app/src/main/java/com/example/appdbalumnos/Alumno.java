@@ -66,12 +66,6 @@ public class Alumno  implements Serializable {
         this.imagen = imagen;
     }
 
-    public Alumno(String matricula, String carrera, String nombre, String imagen) {
-        this.matricula = matricula;
-        this.carrera = carrera;
-        this.nombre = nombre;
-        this.imagen = imagen;
-    }
 
 }
 
